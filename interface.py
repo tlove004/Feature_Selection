@@ -1,20 +1,20 @@
 # interface.py implements the text UI
 # format for text UI taken from project prompt
 import util
+from timeit import default_timer as timer
 
 
 def GetFile():
     print "Welcome to Tyson Loveless' Feature Selection Algorithm."
     name = raw_input('Type in the name of the file to test: ')
     return util.parse(name)
-    #return util.parse("CS205_BIGtestdata__1.txt")
 
 
 def GetAlgorithm():
     print "Type the number of the algorithm you want to run."
     print "\n   1)  Forward Selection"
     print "\n   2)  Backward Elimination"
-    print "\n   3)  Tyson's Special Algorithm\n"
+    print "\n   3)  Tyson's Genetic Algorithm\n"
     search_type = input('                 ')
     return search_type
 
@@ -37,10 +37,12 @@ def main():
 
     print "\nBeginning search.\n"
 
+    start = timer()
     feature_set, accuracy = util.search(search_type, data)
+    end = timer()
 
     print "Finished search!! The best feature subset is {" + ', '.join(str(s+1) for s in feature_set) + "}, which has an accuracy of " + str(accuracy*100) + "%"
-
+    print "\nIt took " + str(end-start) + " seconds to find this feature set."
 
 
 main()
