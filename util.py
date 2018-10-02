@@ -377,8 +377,14 @@ def mutation(feature_set, n):
     return set(features)
 
 
-# deletion chooses a feature to delete that is least used in population
+#
 def delete(feature_set, population):
+    """
+    Deletion chooses a feature to delete that is least used in population
+    :param feature_set: feature set to iterate through
+    :param population: population of given set
+    :return: a new set of features with the least used feature removed.
+    """
     features = [x for x in list(feature_set)]
     pop = [x for y in population for x in y]
     min = float("+inf")
