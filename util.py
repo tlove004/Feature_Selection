@@ -38,6 +38,12 @@ def nearest_neighbor(data):
 
 
 def euclidean_distance(x, y):
+    """
+    Calculates the Euclidean distance between two points
+    :param x: x coordinate
+    :param y: y coordinate
+    :return: euclidean distance between 2 points.
+    """
     distance = 0
     for i, j in zip(x, y):
         distance += (i-j)**2
