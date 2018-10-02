@@ -5,12 +5,21 @@ from timeit import default_timer as timer
 
 
 def GetFile():
+    """
+    Get the file from the command line.
+    (I don't know why I didn't use argsparse...
+    :return: File to be parsed.
+    """
     print "Welcome to Tyson Loveless' Feature Selection Algorithm."
     name = raw_input('Type in the name of the file to test: ')
     return util.parse(name)
 
 
 def GetAlgorithm():
+    """
+    Allows the user to select an algorithm to run on a dataset
+    :return: algorithm to be used.
+    """
     print "Type the number of the algorithm you want to run."
     print "\n   1)  Forward Selection"
     print "\n   2)  Backward Elimination"
@@ -20,6 +29,10 @@ def GetAlgorithm():
 
 
 def main():
+    """
+    Main method of the program, this runs the program
+    :return: null
+    """
     data = GetFile()
     search_type = GetAlgorithm()
 
