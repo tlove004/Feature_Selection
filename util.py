@@ -1,23 +1,24 @@
 # util.py -- where the magic happens
 # All functions developed by Tyson Loveless
 # forward selection and backward elimination modeled off of lecture notes on those topics in CS205
-import math
 import copy
+import math
 import random
 
 DEBUG = False
 USESTACK = True
 
+
 # normalizes feature values ( for each feature x, normalized x' = (x-mean)/std_dev )
 def normalize(_data):
     # looking at features only, ignore class labels
     features = [feature for cls in _data for feature in cls[1:]]
-    mean = sum(sum(row) for row in features)/float((len(features)*len(features[0])))
+    mean = sum(sum(row) for row in features) / float((len(features) * len(features[0])))
     # variance = average of squared difference for each value
-    variance = sum((x-mean)**2 for row in features for x in row)
+    variance = sum((x - mean) ** 2 for row in features for x in row)
     # standard dev is square root of variance
     std_dev = math.sqrt(variance)
-    normalized = [[((x-mean)/std_dev) for x in row] for row in features]
+    normalized = [[((x - mean) / std_dev) for x in row] for row in features]
     return [[_data[i][0], row] for i, row in enumerate(normalized)]
 
 
@@ -47,11 +48,11 @@ def euclidean_distance(x, y):
     Calculates the Euclidean distance between two points.
     :param x: x coordinate
     :param y: y coordinate
-    :return: euclidean distance between x and y.
+    :return: euclidean distance between x and y points.
     """
     distance = 0
     for i, j in zip(x, y):
-        distance += (i-j)**2
+        distance += (i - j) ** 2
     return math.sqrt(distance)
 
 
@@ -74,15 +75,15 @@ def leave_one_out_cross_validation(data, features, best=0):
             correct += 1
         else:
             incorrect += 1
-            if len(data)-incorrect < best:
+            if len(data) - incorrect < best:
                 return 0
 
-    return correct/float(len(data))
+    return correct / float(len(data))
 
 
 def search(option, data):
     # number of features
-    n = data[0][1].__len__()
+    features = data[0][1].__len__()
     current_feature_set = set()
     best_accuracy = 0
     best_feature_set = set()
@@ -94,12 +95,12 @@ def search(option, data):
     used = -1
     total = 0
     checked = []
-    best_per_level = {x: 0 for x in range(1, n+1)}
+    best_per_level = {x: 0 for x in range(1, features + 1)}
 
     if option is 1:
         # forward selection
         while True:
-            for i in range(level, n+1):
+            for i in range(level, features + 1):
                 if DEBUG:
                     print "On the " + str(i) + "th level of the tree"
                 best_so_far_accuracy = 0
@@ -107,8 +108,8 @@ def search(option, data):
                 count = 0
                 temp = []
                 updated = False
-    
-                for k in range (0, n):
+
+                for k in range(0, features):
                     if k == used:
                         continue
                     if current_feature_set.union({k}) in checked:
@@ -116,11 +117,14 @@ def search(option, data):
                     if k not in current_feature_set:
                         if DEBUG:
                             print " --Considering adding feature " + str(k)
-                        accuracy = leave_one_out_cross_validation(data, current_feature_set.union({k}), best_per_level[i]*100)
+                        accuracy = leave_one_out_cross_validation(data, current_feature_set.union({k}),
+                                                                  best_per_level[i] * 100)
                         temp.append([k, accuracy])
-                        print "    Using feature(s) {" + ', '.join(str(s+1) for s in current_feature_set.union({k})) + "} accuracy is " + str(accuracy*100) + "%"
-                        total+=1
-    
+                        print "    Using feature(s) {" + ', '.join(
+                            str(s + 1) for s in current_feature_set.union({k})) + "} accuracy is " + str(
+                            accuracy * 100) + "%"
+                        total += 1
+
                         if accuracy >= best_so_far_accuracy:
                             if best_per_level[i] <= accuracy:
                                 best_per_level[i] = accuracy
@@ -129,9 +133,11 @@ def search(option, data):
                                 count = 0
                             if current_feature_set.union({k}) in checked:
                                 continue
-                            if USESTACK and best_so_far_accuracy == best_per_level[i] and best_so_far_accuracy == accuracy and accuracy > this_accuracy:
-                                stack.append([current_feature_set.union({best_feature_this_level}), i, copy.deepcopy(accuracy)])
-                                count+=1
+                            if USESTACK and best_so_far_accuracy == best_per_level[
+                                i] and best_so_far_accuracy == accuracy and accuracy > this_accuracy:
+                                stack.append(
+                                    [current_feature_set.union({best_feature_this_level}), i, copy.deepcopy(accuracy)])
+                                count += 1
                             else:
                                 for j in range(0, count):
                                     stack.pop()
@@ -145,8 +151,9 @@ def search(option, data):
                                 if maxima:
                                     reset = True
                                 if DEBUG:
-                                    print "feature set {" + ', '.join(str(s+1) for s in best_feature_set) + "} has accuracy " + str(
-                                    accuracy)
+                                    print "feature set {" + ', '.join(
+                                        str(s + 1) for s in best_feature_set) + "} has accuracy " + str(
+                                        accuracy)
 
                 if stack:
                     checked.append(current_feature_set.union({best_feature_this_level}))
@@ -163,28 +170,31 @@ def search(option, data):
                     print "\nNo improvement on this path\n"
                     break
                 if updated:
-                    print "\nFeature set {" + ', '.join(str(s+1) for s in current_feature_set) + "} was best, accuracy is " + str(best_so_far_accuracy*100) + "%\n"
-                
+                    print "\nFeature set {" + ', '.join(
+                        str(s + 1) for s in current_feature_set) + "} was best, accuracy is " + str(
+                        best_so_far_accuracy * 100) + "%\n"
+
                 for index, acc in temp:
                     if acc < best_so_far_accuracy:
                         checked.append(current_feature_set.difference({best_feature_this_level}).union({index}))
-        
+
             if not stack:
                 break
-            #checked.append(copy.deepcopy(current_feature_set))
+            # checked.append(copy.deepcopy(current_feature_set))
             current_feature_set, level, this_accuracy = stack.pop()
             print "(Checking a different path that tied at level " + str(level) + ")"
-            print "\nFeature set {" + ', '.join(str(s+1) for s in current_feature_set) + "} was best, accuracy is " + str(this_accuracy) + "\n"
+            print "\nFeature set {" + ', '.join(
+                str(s + 1) for s in current_feature_set) + "} was best, accuracy is " + str(this_accuracy) + "\n"
             level += 1
-        
+
         print "total number expanded: " + str(total)
 
         return best_feature_set, best_accuracy
     # backward elimination
     elif option is 2:
-        current_feature_set = set(i for i in range(0, n))
+        current_feature_set = set(i for i in range(0, features))
         while True:
-            for i in range(n+1-level, 0, -1):
+            for i in range(features + 1 - level, 0, -1):
                 if DEBUG:
                     print "On the " + str(i) + "th level of the tree"
                 best_so_far_accuracy = 0
@@ -192,8 +202,8 @@ def search(option, data):
                 count = 0
                 temp = []
                 updated = False
-    
-                for k in range(0, n):
+
+                for k in range(0, features):
                     if k == used:
                         continue
                     if current_feature_set.difference({k}) in checked:
@@ -201,11 +211,14 @@ def search(option, data):
                     if k in current_feature_set:
                         if DEBUG:
                             print " --Considering removing feature " + str(k)
-                        accuracy = leave_one_out_cross_validation(data, current_feature_set.difference({k}), best=best_per_level[i]*100)
+                        accuracy = leave_one_out_cross_validation(data, current_feature_set.difference({k}),
+                                                                  best=best_per_level[i] * 100)
                         temp.append([k, accuracy])
-                        print "    Using feature(s) {" + ', '.join(str(s+1) for s in current_feature_set.difference({k})) + "} accuracy is " + str(accuracy*100) + "%"
-                        total+=1
-    
+                        print "    Using feature(s) {" + ', '.join(
+                            str(s + 1) for s in current_feature_set.difference({k})) + "} accuracy is " + str(
+                            accuracy * 100) + "%"
+                        total += 1
+
                         if accuracy >= best_so_far_accuracy:
                             if best_per_level[i] <= accuracy:
                                 best_per_level[i] = accuracy
@@ -214,9 +227,11 @@ def search(option, data):
                                 count = 0
                             if current_feature_set.difference({k}) in checked:
                                 continue
-                            if USESTACK and best_per_level[i] == accuracy and best_so_far_accuracy == accuracy and accuracy > this_accuracy:
-                                stack.append([current_feature_set.difference({worst_feature_this_level}), n+1-i, copy.deepcopy(accuracy)])
-                                count+=1
+                            if USESTACK and best_per_level[
+                                i] == accuracy and best_so_far_accuracy == accuracy and accuracy > this_accuracy:
+                                stack.append([current_feature_set.difference({worst_feature_this_level}), features + 1 - i,
+                                              copy.deepcopy(accuracy)])
+                                count += 1
                             else:
                                 for j in range(0, count):
                                     stack.pop()
@@ -230,9 +245,10 @@ def search(option, data):
                                 if maxima:
                                     reset = True
                                 if DEBUG:
-                                    print "feature set {" + ', '.join(str(s+1) for s in best_feature_set) + "} has accuracy " + str(
-                                    accuracy)
-    
+                                    print "feature set {" + ', '.join(
+                                        str(s + 1) for s in best_feature_set) + "} has accuracy " + str(
+                                        accuracy)
+
                 if stack:
                     checked.append(current_feature_set.difference({worst_feature_this_level}))
                 try:
@@ -250,37 +266,38 @@ def search(option, data):
                     print "\nNo improvement this path\n"
                     break
                 if updated:
-                    print "\nFeature set {" + ', '.join(str(s+1) for s in current_feature_set) + "} was best, accuracy is " + str(
+                    print "\nFeature set {" + ', '.join(
+                        str(s + 1) for s in current_feature_set) + "} was best, accuracy is " + str(
                         best_so_far_accuracy * 100) + "%\n"
 
             if not stack:
                 break
             current_feature_set, level, this_accuracy = stack.pop()
-            print "(Checking a different path that tied at level " + str(n+1-level) + ")"
+            print "(Checking a different path that tied at level " + str(features + 1 - level) + ")"
             print "\nFeature set {" + ', '.join(
-                str(s + 1) for s in current_feature_set) + "} was best, accuracy is " + str(this_accuracy*100) + "%\n"
+                str(s + 1) for s in current_feature_set) + "} was best, accuracy is " + str(this_accuracy * 100) + "%\n"
             level += 1
 
         print "total number expanded: " + str(total)
 
         return best_feature_set, best_accuracy
     # my searching function
-    
+
     # population = a set of feature sets (randomly generated at first)
     # selection = function to choose which features to keep
     # crossover = function to merge two feature sets together
     # mutation = function to randomly replace features with other features
     # fitness = leave_one_out_cross_validation (so as to compare directly with forward selection/backward elim)
-    
+
     elif option is 3:
         # evaluations = 100
         best_feature_set = 0
         total = 0
         best_accuracy = 0
         print("Generating random population..."),
-        population = init_population(n, data.__len__())
+        population = init_population(features, data.__len__())
         print("Done!\n")
-        while len(population) > n/4:
+        while len(population) > features / 4:
             print("Finding most fit individuals...")
             population, fitness, best_feature_this_level, add = selection(data, population)
             total += add
@@ -290,43 +307,44 @@ def search(option, data):
                 best_accuracy = fitness[0]
                 best_feature_set = copy.deepcopy(best_feature_this_level)
             print("\nPerforming crossover and mutations...")
-            population = generation(population, fitness, n)
+            population = generation(population, fitness, features)
             print("Done!\n")
         print "Total number cross-validated: " + str(total)
         return best_feature_set, best_accuracy
-    
-    
+
+
 def init_population(num_features, num_instances):
     population = set()
-    length = num_features*int(math.sqrt(num_instances))
+    length = num_features * int(math.sqrt(num_instances))
     while population.__len__() < length:
         feature_set = set()
-        for i in range(0, random.randint(1, num_features-1)):
-            feature_set.add(random.randint(0, num_features-1))
+        for i in range(0, random.randint(1, num_features - 1)):
+            feature_set.add(random.randint(0, num_features - 1))
         population.add(frozenset(sorted(feature_set)))
-        
+
     return population
 
 
 def selection(data, population):
-    fitness = [] #will hold accuracy for each feature
+    fitness = []  # will hold accuracy for each feature
     total = 0
     for features in population:
         accuracy = leave_one_out_cross_validation(data, features)
         total += 1
         fitness.append([accuracy, features])
-    fitness.sort(key=lambda tup: tup[0], reverse=True) #sort by accuracy
-    length = fitness.__len__()/10
+    fitness.sort(key=lambda tup: tup[0], reverse=True)  # sort by accuracy
+    length = fitness.__len__() / 10
     best = [x[1] for i, x in enumerate(fitness) if i in range(0, length)]
     acc = [x[0] for i, x in enumerate(fitness) if i in range(0, length)]
     if length > 0:
-        print "Top " + str(length) + " feature sets:\n{" + '\n{'.join(', '.join(str(i+1) for i in list(s)) + '} with accuracy ' + str(x) for s, x in zip(best, acc))
+        print "Top " + str(length) + " feature sets:\n{" + '\n{'.join(
+            ', '.join(str(i + 1) for i in list(s)) + '} with accuracy ' + str(x) for s, x in zip(best, acc))
     return best, acc, fitness[0][1], total
 
 
 def generation(population, fitness, n):
     pop = set()
-    while len(pop) < len(population)*5:
+    while len(pop) < len(population) * 5:
         for feature_set, fit in zip(population, fitness):
             # 25% crossover, 25% mutations, 50% deletions
             j = random.uniform(0, 1)
@@ -340,7 +358,7 @@ def generation(population, fitness, n):
             if len(new) == 0:
                 continue
             if new not in pop:
-                print "   New individual added to population: {" + ', '.join(str(s+1) for s in new) + "}"
+                print "   New individual added to population: {" + ', '.join(str(s + 1) for s in new) + "}"
                 pop.add(frozenset(new))
             else:
                 new = mutation(feature_set, n)
@@ -353,8 +371,8 @@ def generation(population, fitness, n):
 
 def mutation(feature_set, n):
     features = [x for x in list(feature_set)]
-    index = random.randint(0, len(features)-1)
-    change = random.randint(0, n-1)
+    index = random.randint(0, len(features) - 1)
+    change = random.randint(0, n - 1)
     features[index] = change
     return set(features)
 
@@ -389,8 +407,9 @@ def best_crossover(feature_set, population):
         new.append(most)
         pop = filter(lambda a: a != most, pop)
         max = float("-inf")
-        
+
     return set(new).union(feature_set)
+
 
 def crossover(feature_set, population):
     features = [x for x in list(feature_set)]
