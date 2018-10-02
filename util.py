@@ -380,9 +380,9 @@ def mutation(feature_set, num_features):
 #
 def delete(feature_set, population):
     """
-    Deletion chooses a feature to delete that is least used in population
-    :param feature_set: feature set to iterate through
-    :param population: population of given set
+    Deletion chooses a feature to delete that is least used in the population
+    :param feature_set: current set of features being considered
+    :param population: set of feature sets
     :return: a new set of features with the least used feature removed.
     """
     features = [x for x in list(feature_set)]
@@ -399,6 +399,12 @@ def delete(feature_set, population):
 
 
 def best_crossover(feature_set, population):
+    """
+    Performs crossover on the best fit member of the population
+    :param feature_set: current set of features being considered
+    :param population: set of feature sets.
+    :return: a new set of features that include the best crossover.
+    """
     new = []
     pop = [x for y in population for x in y]
     most = pop[0]
