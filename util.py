@@ -33,11 +33,22 @@ def parse(file):
 
 
 def nearest_neighbor(data):
+    """
+    Calculates the nearest neighbor for some set of data.
+    :param data: Set of data that needs to be classified.
+    :return: Accuracy of k-1 leave one out validation.
+    """
     features = set([i for i, x in enumerate(data[0][1])])
     return leave_one_out_cross_validation(data, features)
 
 
 def euclidean_distance(x, y):
+    """
+    Calculates the Euclidean distance between two points.
+    :param x: x coordinate
+    :param y: y coordinate
+    :return: euclidean distance between x and y.
+    """
     distance = 0
     for i, j in zip(x, y):
         distance += (i-j)**2
