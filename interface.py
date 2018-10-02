@@ -6,9 +6,8 @@ from timeit import default_timer as timer
 
 def GetFile():
     """
-    Get the file from the command line.
-    (I don't know why I didn't use argsparse...
-    :return: File to be parsed.
+    Get and parse data from the given file.
+    :return: Parsed data.
     """
     print "Welcome to Tyson Loveless' Feature Selection Algorithm."
     name = raw_input('Type in the name of the file to test: ')
@@ -30,7 +29,7 @@ def GetAlgorithm():
 
 def main():
     """
-    Main method of the program, this runs the program
+    Main method of the program, implements the UI for running the feature selection algorithm(s)
     :return: null
     """
     data = GetFile()
