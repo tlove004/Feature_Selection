@@ -399,6 +399,12 @@ def delete(feature_set, population):
 
 
 def best_crossover(feature_set, population):
+    """
+    What is the best crossover for this feature?
+    :param feature_set: set of features to be observed.
+    :param population: population of given set.
+    :return: a new set of features that include the best crossover.
+    """
     new = []
     pop = [x for y in population for x in y]
     most = pop[0]
