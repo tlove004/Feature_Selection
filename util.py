@@ -47,7 +47,7 @@ def euclidean_distance(x, y):
     Calculates the Euclidean distance between two points.
     :param x: x coordinate
     :param y: y coordinate
-    :return: euclidean distance between 2 points.
+    :return: euclidean distance between x and y.
     """
     distance = 0
     for i, j in zip(x, y):
